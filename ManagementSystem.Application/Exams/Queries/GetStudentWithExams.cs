@@ -1,0 +1,1 @@
+public record GetStudentWithExamsQuery(Guid StudentId);
