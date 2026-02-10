@@ -5,6 +5,7 @@ namespace ManagementSystem.Domain.Entities;
 public class Student
 {
     public StudentId Id { get; private set; }
+    
     public string FullName { get; private set; }
     
     public DateOnly BirthDate { get; private set; }
@@ -27,5 +28,15 @@ public class Student
         if(exam == null)
             throw new DomainException("Exam cannot be null");
         _Exams.Add(exam);
+    }
+    public void UpdateName(string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName)) throw new ArgumentException("Le nom ne peut pas être vide");
+        this.FullName = newName;
+    }
+
+    public void UpdateBirthDate(DateOnly newDate)
+    {
+        this.BirthDate = newDate;
     }
 }

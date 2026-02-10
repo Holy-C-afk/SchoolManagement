@@ -19,16 +19,53 @@ namespace ManagementSystem.Infrastructure.Persistence.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Student?> GetByIdAsync(StudentId id)
+        public async Task AddRangeAsync(IEnumerable<Student> students)
         {
+            _context.Students.AddRange(students);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Student?> GetByIdAsync(Guid id)
+        {
+            var studentId = new StudentId(id);
+
+            // Pas de Include ici pour éviter les doublons dus aux jointures
             return await _context.Students
-                .Include(s => s.Exams)
-                .FirstOrDefaultAsync(s => s.Id == id);
+                .FirstOrDefaultAsync(s => s.Id == studentId);
         }
 
         public async Task UpdateAsync(Student student)
         {
+            // Pour éviter les conflits de tracking sur le PUT :
+            var trackedEntity = _context.Students.Local.FirstOrDefault(s => s.Id.Value == student.Id.Value);
+            if (trackedEntity != null)
+            {
+                _context.Entry(trackedEntity).State = EntityState.Detached;
+            }
+
             _context.Students.Update(student);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IReadOnlyList<Student>> GetAllAsync()
+        {
+            return await _context.Students
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            var studentId = new StudentId(id);
+            var student = await _context.Students
+                .FirstOrDefaultAsync(s => s.Id == studentId);
+
+            if (student is null)
+            {
+                return;
+            }
+
+            _context.Students.Remove(student);
             await _context.SaveChangesAsync();
         }
     }

@@ -1,15 +1,22 @@
 using System.Text;
+using ManagementSystem.Application.Students;
 using ManagementSystem.Infrastructure.Persistence; // Vérifie que ce namespace correspond à ton DbContext
+using ManagementSystem.Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ManagementSystem.Application; // Assure-toi que c'est le namespace exact défini dans ton fichier DependencyInjection.cs
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<IStudentService, StudentService>();
+// Ajoute tous les services définis dans ton projet Application
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+
 
 // --- 1. CONFIGURATION DU DBCONTEXT ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ManagementDbContext>(options =>
+builder.Services.AddDbContextPool<ManagementDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 // --- 2. CONFIGURATION DU CORS (Pour React) ---
@@ -74,7 +81,8 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-
+// Ajoute tous les services définis dans ton projet Application
+builder.Services.AddApplication();
 var app = builder.Build();
 
 // --- 5. CONFIGURATION DU PIPELINE HTTP (L'ORDRE EST CRUCIAL) ---

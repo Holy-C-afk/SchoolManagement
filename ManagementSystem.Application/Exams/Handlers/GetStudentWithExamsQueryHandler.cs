@@ -11,7 +11,9 @@ public class GetStudentWithExamsQueryHandler
 
     public async Task<StudentWithExamsDto> Handle(GetStudentWithExamsQuery query)
     {
-        var student = await _studentRepository.GetByIdAsync(new StudentId(query.StudentId));
+       // On extrait le Guid via .Value
+       // On le passe directement sans .Value
+        var student = await _studentRepository.GetByIdAsync(query.StudentId);
         if (student == null)
         {
             throw new Exception("Student not found");

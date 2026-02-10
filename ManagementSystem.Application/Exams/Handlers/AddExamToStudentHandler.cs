@@ -9,7 +9,7 @@ public class AddExamToStudentHandler
     }
     public async Task Handle(AddExamToStudentCommand command)
     {
-        var student = await _studentRepository.GetByIdAsync(command.StudentId);
+        var student = await _studentRepository.GetByIdAsync(command.StudentId.Value);
         if (student == null)
         {
             throw new Exception("Student not found");

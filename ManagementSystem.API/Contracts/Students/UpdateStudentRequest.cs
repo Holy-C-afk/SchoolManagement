@@ -1,7 +1,7 @@
 namespace ManagementSystem.API.Models.Requests;
 
-public record  CreateStudentRequest(
+public record UpdateStudentRequest(
      string FirstName,
      string LastName,
-     string BirthDate
+     DateOnly BirthDate
 );

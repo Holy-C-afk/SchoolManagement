@@ -1,3 +1,5 @@
+using ManagementSystem.Domain.ValueObjects; // Pour reconnaître StudentId
+using ManagementSystem.Application.Students; // Pour reconnaître StudentDto
 public class GetStudentByIdhandler
 {
     private readonly IStudentRepository _studentRepository;
@@ -8,7 +10,7 @@ public class GetStudentByIdhandler
     }
     public async Task<StudentDto?> Handle(GetStudentByIdQuery query)
     {
-        var student = await _studentRepository.GetByIdAsync(query.Id);
+        var student = await _studentRepository.GetByIdAsync(query.Id.Value);
         if (student == null)
         {
             return null;

@@ -7,16 +7,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using ManagementSystem.Infrastructure.Persistence; // Chemin vers ton DbContext
 using ManagementSystem.Domain.Entities;          // Chemin vers ton entité User
-using ManagementSystem.API.DTOs;                // Chemin vers tes DTOs
-
+            
 // On définit des alias pour éviter l'erreur d'ambiguïté avec Microsoft.AspNetCore.Identity
 using LoginRequest = ManagementSystem.API.DTOs.LoginRequest;
 using RegisterRequest = ManagementSystem.API.Contracts.Auth.RegisterRequest;
@@ -65,7 +58,8 @@ public class AuthController : ControllerBase
 
         // 3. Générer le Token pour cet utilisateur spécifique
         var token = GenerateToken(user);
-        return Ok(new { Token = token });
+        // on renvoie "token" en camelCase pour correspondre au front React
+        return Ok(new { token });
     }
 
     private string GenerateToken(User user)
