@@ -24,18 +24,25 @@ namespace ManagementSystem.Infrastructure.Persistence.Repositories
             _context.Students.AddRange(students);
             await _context.SaveChangesAsync();
         }
-        public async Task<(IReadOnlyList<Student> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize)
+        public async Task<(IReadOnlyList<Student> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize, string? search = null)
         {
-            var query = _context.Students.AsNoTracking().OrderBy(s => s.FullName);
+            var query = _context.Students.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(s =>
+                    EF.Functions.Like(s.FullName, $"%{search}%"));
+            }
 
             var totalCount = await query.CountAsync();
 
-            var items = await query
+            var Items = await query
+                .OrderBy(s => s.FullName)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (items, totalCount);
+            return (Items, totalCount);
         }
 
         public async Task<Student?> GetByIdAsync(Guid id)

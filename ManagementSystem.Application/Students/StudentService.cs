@@ -43,9 +43,11 @@ namespace ManagementSystem.Application.Students
                 s.BirthDate
             )).ToList();
         }
-        public async Task<(IReadOnlyList<StudentDto> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize)
+        public async Task<(IReadOnlyList<StudentDto> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize,
+        string? search = null)
         {
             var (students, totalCount) = await _repository.GetPagedAsync(pageNumber, pageSize);
+            
 
             var items = students
                 .Select(s => new StudentDto(s.Id.Value, s.FullName, s.BirthDate))

@@ -56,23 +56,18 @@ public class StudentsController : ControllerBase
     }
     //[Authorize]
     [HttpGet("paged")]
-    public async Task<IActionResult> GetPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10,
+    [FromQuery] string? search = null)
     {
         if (pageNumber <= 0 || pageSize <= 0) 
             return BadRequest("pageNumber et pageSize doivent être > 0");
 
-        var (items, totalCount) = await _studentService.GetPagedAsync(pageNumber, pageSize);
+        var (items, totalCount) = await _studentService.GetPagedAsync(pageNumber, pageSize, search);
 
-        var responseItems = items.Select(s => new
-        {
-            id = s.id,
-            fullName = s.fullName,
-            birthDate = s.dateOfBirth
-        });
 
         return Ok(new
         {
-            items = responseItems,
+            items,
             totalCount,
             pageNumber,
             pageSize,
