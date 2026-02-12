@@ -37,21 +37,12 @@ public class StudentsController : ControllerBase
         return Ok(new { id, message = "Étudiant créé avec succès !" });
     }
 
-    // GET: api/students?search=...
+    // GET: api/students
     [Authorize]
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] string? search)
+    public async Task<IActionResult> GetAll()
     {
         var students = await _studentService.GetAllAsync();
-
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            var term = search.Trim().ToLower();
-            students = students
-                .Where(s => !string.IsNullOrEmpty(s.fullName) &&
-                            s.fullName.ToLower().Contains(term))
-                .ToList();
-        }
 
         // On normalise la forme JSON pour le front (id, fullName, birthDate)
         var response = students.Select(s => new
@@ -62,6 +53,31 @@ public class StudentsController : ControllerBase
         });
 
         return Ok(response);
+    }
+    //[Authorize]
+    [HttpGet("paged")]
+    public async Task<IActionResult> GetPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        if (pageNumber <= 0 || pageSize <= 0) 
+            return BadRequest("pageNumber et pageSize doivent être > 0");
+
+        var (items, totalCount) = await _studentService.GetPagedAsync(pageNumber, pageSize);
+
+        var responseItems = items.Select(s => new
+        {
+            id = s.id,
+            fullName = s.fullName,
+            birthDate = s.dateOfBirth
+        });
+
+        return Ok(new
+        {
+            items = responseItems,
+            totalCount,
+            pageNumber,
+            pageSize,
+            totalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+        });
     }
     //PUT: api/students/{id}
     [Authorize]

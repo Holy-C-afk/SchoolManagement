@@ -4,6 +4,9 @@ import { GraduationCap, Trash2, Plus, X, Pencil, Search } from 'lucide-react';
 
 const StudentList = ({ onLogout }) => {
     const [students, setStudents] = useState([]);
+    const [pageNumber, setPageNumber] = useState(1);
+    const [pageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
     const [fetchError, setFetchError] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -19,29 +22,33 @@ const StudentList = ({ onLogout }) => {
     });
     const [bulkInput, setBulkInput] = useState('');
     const [search, setSearch] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
 
 
     // Charger les étudiants
-    const fetchStudents = async () => {
-        try {
-            console.log("Fetching students...");
-            const res = await api.get('/Students');
-            setStudents(res.data);
-            setFetchError('');
-            console.log("Students fetched:", res.data);
-        } catch (err) {
-            const status = err?.response?.status;
-            const data = err?.response?.data;
-            const msg =
-                status
-                    ? `Erreur API (${status}) sur GET /Students: ${typeof data === 'string' ? data : JSON.stringify(data)}`
-                    : `Erreur réseau sur GET /Students: ${err.message}`;
-            console.error("Erreur fetchStudents:", err.response || err.message);
-            setFetchError(msg);
-            setStudents([]);
-        }
-    };
+    const fetchStudents = async (page = pageNumber) => {
+    try {
+        const res = await api.get('/Students/paged', {
+            params: { pageNumber: page, pageSize }
+        });
+
+        setStudents(res.data.items);
+        setPageNumber(res.data.pageNumber);
+        setTotalPages(res.data.totalPages);
+        setFetchError('');
+    } catch (err) {
+        const status = err?.response?.status;
+        const data = err?.response?.data;
+        const msg =
+            status
+                ? `Erreur API (${status}) sur GET /Students: ${typeof data === 'string' ? data : JSON.stringify(data)}`
+                : `Erreur réseau sur GET /Students: ${err.message}`;
+
+        console.error("Erreur fetchStudents:", err.response || err.message);
+        setFetchError(msg);
+        setStudents([]);
+    }
+};
+
 
     useEffect(() => { fetchStudents(); }, []);
 
@@ -145,16 +152,9 @@ const StudentList = ({ onLogout }) => {
         }
     };
 
-    const pageSize = 5;
-
     const filteredStudents = students.filter(student =>
         student.fullName?.toLowerCase().includes(search.toLowerCase())
     );
-
-    const totalPages = Math.max(1, Math.ceil(filteredStudents.length / pageSize));
-    const safeCurrentPage = Math.min(currentPage, totalPages);
-    const startIndex = (safeCurrentPage - 1) * pageSize;
-    const pagedStudents = filteredStudents.slice(startIndex, startIndex + pageSize);
 
     return (
         <div className="min-h-screen bg-slate-50 p-4 md:p-8">
@@ -179,10 +179,7 @@ const StudentList = ({ onLogout }) => {
                                 placeholder="Rechercher par nom..."
                                 className="w-full md:w-64 pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                                 value={search}
-                                onChange={e => {
-                                    setSearch(e.target.value);
-                                    setCurrentPage(1);
-                                }}
+                                onChange={e => setSearch(e.target.value)}
                             />
                         </div>
                         <div className="flex gap-3">
@@ -220,9 +217,30 @@ const StudentList = ({ onLogout }) => {
                         </div>
                     </div>
                 )}
+                <div className="flex items-center justify-between mt-6">
+                <button
+                    disabled={pageNumber <= 1}
+                    onClick={() => fetchStudents(pageNumber - 1)}
+                    className="px-3 py-2 rounded-lg border text-sm disabled:opacity-50"
+                >
+                    Précédent
+                </button>
+
+                <span className="text-sm text-slate-600">
+                    Page {pageNumber} / {totalPages}
+                </span>
+
+                <button
+                    disabled={pageNumber >= totalPages}
+                    onClick={() => fetchStudents(pageNumber + 1)}
+                    className="px-3 py-2 rounded-lg border text-sm disabled:opacity-50"
+                >
+                    Suivant
+                </button>
+                </div>
                 <div className="space-y-4">
-                    {pagedStudents.length > 0 ? (
-                        pagedStudents.map(student => (
+                    {filteredStudents.length > 0 ? (
+                        filteredStudents.map(student => (
                             <div key={student.id} className="p-4 border rounded-xl shadow-sm flex justify-between items-center bg-white">
                                 <div>
                                     <div className="font-bold text-slate-800">{student.fullName}</div>
@@ -252,35 +270,6 @@ const StudentList = ({ onLogout }) => {
                         </div>
                     )}
                 </div>
-
-                {/* Pagination */}
-                {filteredStudents.length > 0 && (
-                    <div className="flex items-center justify-between mt-6 text-sm text-slate-600">
-                        <button
-                            disabled={safeCurrentPage <= 1}
-                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                            className="px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Précédent
-                        </button>
-
-                        <div>
-                            Page <span className="font-semibold">{safeCurrentPage}</span> /{" "}
-                            <span className="font-semibold">{totalPages}</span> &nbsp;
-                            <span className="text-xs text-slate-500">
-                                ({filteredStudents.length} étudiant(s) filtré(s))
-                            </span>
-                        </div>
-
-                        <button
-                            disabled={safeCurrentPage >= totalPages}
-                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                            className="px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Suivant
-                        </button>
-                    </div>
-                )}
 
 
                 {/* MODALE DE CRÉATION (S'affiche si isModalOpen est true) */}

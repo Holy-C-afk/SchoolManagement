@@ -24,6 +24,19 @@ namespace ManagementSystem.Infrastructure.Persistence.Repositories
             _context.Students.AddRange(students);
             await _context.SaveChangesAsync();
         }
+        public async Task<(IReadOnlyList<Student> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize)
+        {
+            var query = _context.Students.AsNoTracking().OrderBy(s => s.FullName);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
 
         public async Task<Student?> GetByIdAsync(Guid id)
         {

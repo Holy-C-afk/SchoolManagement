@@ -5,6 +5,7 @@ public interface IStudentRepository
 {
     Task AddAsync(Student student);
     Task AddRangeAsync(IEnumerable<Student> students);
+    Task<(IReadOnlyList<Student> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize);
     Task<IReadOnlyList<Student>> GetAllAsync();
     Task<Student?> GetByIdAsync(Guid id);
     Task UpdateAsync(Student student);

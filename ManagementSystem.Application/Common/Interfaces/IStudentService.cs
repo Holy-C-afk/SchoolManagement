@@ -9,6 +9,7 @@ public interface IStudentService
     Task<Guid> CreateAsync(CreateStudentCommand command);
     Task<StudentDto?> GetByIdAsync(Guid id);
     Task<IReadOnlyList<StudentDto>> GetAllAsync();
+    Task<(IReadOnlyList<StudentDto> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize);
     Task UpdateAsync(Guid id, UpdateStudentCommand command);
     Task DeleteAsync(Guid id);
     Task<IReadOnlyList<Guid>> BulkCreateAsync(IEnumerable<CreateStudentCommand> commands);
