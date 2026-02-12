@@ -158,21 +158,22 @@ const StudentList = ({ onLogout }) => {
     };
     const handleExportPdf = async () => {
         try {
-            // On utilise l'instance 'api' qui injecte déjà le Token
             const response = await api.get('/Students/export/pdf', {
-                params: { search: search },
-                responseType: 'blob', // Indispensable pour traiter le flux binaire du PDF
-            });
+            // C'est ici qu'on envoie le filtre actuel au backend
+            params: { search: search }, 
+            responseType: 'blob', 
+        });
 
-            // Création d'un lien invisible pour déclencher le téléchargement
             const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `Liste_Etudiants_${new Date().toISOString().split('T')[0]}.pdf`);
+            
+            
+            const fileName = search ? `Etudiants_Filtre_${search}.pdf` : "Liste_Etudiants.pdf";
+            link.setAttribute('download', fileName);
+            
             document.body.appendChild(link);
             link.click();
-            
-            // Nettoyage
             link.parentNode.removeChild(link);
             window.URL.revokeObjectURL(url);
         } catch (err) {
@@ -181,9 +182,9 @@ const StudentList = ({ onLogout }) => {
         }
     };
 
-    const filteredStudents = students.filter(student =>
+    /*const filteredStudents = students.filter(student =>
         student.fullName?.toLowerCase().includes(search.toLowerCase())
-    );
+    );*/
 
     return (
         <div className="min-h-screen bg-slate-50 p-4 md:p-8">
