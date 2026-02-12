@@ -1,6 +1,7 @@
 
 using ManagementSystem.API.Models.Requests;
 using ManagementSystem.Application.Students;
+using ManagementSystem.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +12,12 @@ namespace ManagementSystem.API.Controllers;
 public class StudentsController : ControllerBase
 {
     private readonly IStudentService _studentService;
+    private readonly IPdfService _pdfService;
 
-    public StudentsController(IStudentService studentService)
+    public StudentsController(IStudentService studentService, IPdfService pdfService)
     {
         _studentService = studentService;
+        _pdfService = pdfService;
     }
 
     // POST: api/students
@@ -123,4 +126,17 @@ public class StudentsController : ControllerBase
 
         return Ok(new { ids });
     }
+    [HttpGet("export/pdf")]
+    public async Task<IActionResult> ExportPdf([FromQuery] string? search = null)
+    {
+        // 1️⃣ Récupérer les étudiants filtrés
+        var (students, _) = await _studentService.GetPagedAsync(1, int.MaxValue, search);
+
+        // 2️⃣ Générer PDF
+        var pdfBytes = _pdfService.GenerateStudentsPdf(students);
+
+        // 3️⃣ Retourner fichier
+        return File(pdfBytes, "application/pdf", "Etudiants.pdf");
+}
+
 }

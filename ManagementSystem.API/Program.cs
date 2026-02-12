@@ -7,8 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ManagementSystem.Application; // Assure-toi que c'est le namespace exact défini dans ton fichier DependencyInjection.cs
+using ManagementSystem.Application.Common.Interfaces;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 // Ajoute tous les services définis dans ton projet Application
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
@@ -83,6 +86,9 @@ builder.Services.AddSwaggerGen(c =>
 });
 // Ajoute tous les services définis dans ton projet Application
 builder.Services.AddApplication();
+//Config QuestPDF
+QuestPDF.Settings.License = LicenseType.Community;
+
 var app = builder.Build();
 
 // --- 5. CONFIGURATION DU PIPELINE HTTP (L'ORDRE EST CRUCIAL) ---

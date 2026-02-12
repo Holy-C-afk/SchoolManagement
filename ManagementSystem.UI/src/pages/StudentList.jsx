@@ -398,7 +398,15 @@ const StudentList = ({ onLogout }) => {
                     </div>
                 )}
             </div>
+            <button
+  onClick={() => window.open(`http://localhost:5038/api/Students/export/pdf?search=${search}`, "_blank")}
+  className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition-all"
+>
+  Export PDF
+</button>
+
         </div>
+        
     );
 };
 export default StudentList;
