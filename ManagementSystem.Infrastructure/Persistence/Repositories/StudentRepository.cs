@@ -30,8 +30,9 @@ namespace ManagementSystem.Infrastructure.Persistence.Repositories
 
             if (!string.IsNullOrWhiteSpace(search))
             {
-                query = query.Where(s =>
-                    EF.Functions.Like(s.FullName, $"%{search}%"));
+                // Dans ton Repository C#
+query = query.Where(s => 
+    EF.Functions.Like(s.FullName.ToLower(), $"%{search.ToLower()}%"));
             }
 
             var totalCount = await query.CountAsync();

@@ -43,18 +43,20 @@ namespace ManagementSystem.Application.Students
                 s.BirthDate
             )).ToList();
         }
-        public async Task<(IReadOnlyList<StudentDto> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize,
-        string? search = null)
+        public async Task<(IReadOnlyList<StudentDto> Items, int TotalCount)> GetPagedAsync(
+            int pageNumber, 
+            int pageSize,
+            string? search = null) // Le paramètre arrive bien ici...
         {
-            var (students, totalCount) = await _repository.GetPagedAsync(pageNumber, pageSize);
-            
+            // ...mais il faut l'envoyer au repository !
+            var (students, totalCount) = await _repository.GetPagedAsync(pageNumber, pageSize, search);
 
             var items = students
                 .Select(s => new StudentDto(s.Id.Value, s.FullName, s.BirthDate))
                 .ToList();
 
             return (items, totalCount);
-        }
+}
 
         public async Task UpdateAsync(Guid id, UpdateStudentCommand command)
         {

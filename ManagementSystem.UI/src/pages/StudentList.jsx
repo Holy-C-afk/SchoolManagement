@@ -28,13 +28,15 @@ const StudentList = ({ onLogout }) => {
     const fetchStudents = async (page = pageNumber) => {
     try {
         const res = await api.get('/Students/paged', {
-            params: { pageNumber: page, pageSize }
+            params: { 
+                pageNumber: page, 
+                pageSize: pageSize,
+                search: search // On utilise le paramètre passé à la fonction
+            }
         });
-
         setStudents(res.data.items);
         setPageNumber(res.data.pageNumber);
         setTotalPages(res.data.totalPages);
-        setFetchError('');
     } catch (err) {
         const status = err?.response?.status;
         const data = err?.response?.data;
@@ -50,7 +52,10 @@ const StudentList = ({ onLogout }) => {
 };
 
 
-    useEffect(() => { fetchStudents(); }, []);
+    useEffect(() => {
+    // On passe explicitement 'search' ici
+    fetchStudents(1, search); 
+}, [search]);
 
     // Fonction de création
     const handleCreate = async (e) => {
@@ -151,6 +156,30 @@ const StudentList = ({ onLogout }) => {
             );
         }
     };
+    const handleExportPdf = async () => {
+        try {
+            // On utilise l'instance 'api' qui injecte déjà le Token
+            const response = await api.get('/Students/export/pdf', {
+                params: { search: search },
+                responseType: 'blob', // Indispensable pour traiter le flux binaire du PDF
+            });
+
+            // Création d'un lien invisible pour déclencher le téléchargement
+            const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Liste_Etudiants_${new Date().toISOString().split('T')[0]}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            
+            // Nettoyage
+            link.parentNode.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error("Erreur export PDF:", err);
+            alert("Erreur lors de la génération du PDF (vérifiez vos droits d'accès)");
+        }
+    };
 
     const filteredStudents = students.filter(student =>
         student.fullName?.toLowerCase().includes(search.toLowerCase())
@@ -239,8 +268,8 @@ const StudentList = ({ onLogout }) => {
                 </button>
                 </div>
                 <div className="space-y-4">
-                    {filteredStudents.length > 0 ? (
-                        filteredStudents.map(student => (
+                    {students.length > 0 ? (
+                        students.map(student => (
                             <div key={student.id} className="p-4 border rounded-xl shadow-sm flex justify-between items-center bg-white">
                                 <div>
                                     <div className="font-bold text-slate-800">{student.fullName}</div>
@@ -399,11 +428,11 @@ const StudentList = ({ onLogout }) => {
                 )}
             </div>
             <button
-  onClick={() => window.open(`http://localhost:5038/api/Students/export/pdf?search=${search}`, "_blank")}
-  className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition-all"
->
-  Export PDF
-</button>
+                onClick={handleExportPdf}
+                className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-all flex items-center gap-2"
+                >
+                Export PDF
+                </button>
 
         </div>
         
