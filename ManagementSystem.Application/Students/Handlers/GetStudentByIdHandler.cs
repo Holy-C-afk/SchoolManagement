@@ -1,5 +1,6 @@
 using ManagementSystem.Domain.ValueObjects; // Pour reconnaître StudentId
-using ManagementSystem.Application.Students; // Pour reconnaître StudentDto
+using ManagementSystem.Application.Common.Interfaces; // Pour reconnaître IStudentRepository
+using ManagementSystem.Application.Students.DTOs; // Pour reconnaître StudentDto
 public class GetStudentByIdhandler
 {
     private readonly IStudentRepository _studentRepository;

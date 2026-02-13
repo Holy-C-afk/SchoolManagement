@@ -129,13 +129,12 @@ public class StudentsController : ControllerBase
     [HttpGet("export/pdf")]
     public async Task<IActionResult> ExportPdf([FromQuery] string? search = null)
     {
-        // 1️⃣ Récupérer les étudiants filtrés
+        // Récupérer les étudiants filtrés
         var (students, _) = await _studentService.GetPagedAsync(1, int.MaxValue, search);
 
-        // 2️⃣ Générer PDF
         var pdfBytes = _pdfService.GenerateStudentsPdf(students);
 
-        // 3️⃣ Retourner fichier
+        //  Retourner fichier
         return File(pdfBytes, "application/pdf", "Etudiants.pdf");
 }
 

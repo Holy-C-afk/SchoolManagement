@@ -1,15 +1,19 @@
-public sealed class CourseId
+namespace ManagementSystem.Domain.ValueObjects
 {
-    public Guid Value { get; }
 
-    public CourseId(Guid value)
+    public sealed class CourseId
     {
-        if (value == Guid.Empty)
-            throw new ArgumentException("CourseId cannot be empty");
+        public Guid Value { get; }
 
-        Value = value;
+        public CourseId(Guid value)
+        {
+            if (value == Guid.Empty)
+                throw new ArgumentException("CourseId cannot be empty");
+
+            Value = value;
+        }
+
+        // Ajoute ceci pour Entity Framework
+        private CourseId() { } 
     }
-
-    // Ajoute ceci pour Entity Framework
-    private CourseId() { } 
 }

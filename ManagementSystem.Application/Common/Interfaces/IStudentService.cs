@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ManagementSystem.Application.Students.DTOs;
+using ManagementSystem.Application.Common.Interfaces;
+
 
 namespace ManagementSystem.Application.Students;
 

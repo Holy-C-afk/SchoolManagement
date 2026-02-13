@@ -1,11 +1,14 @@
-public sealed class DepartmentId
+namespace ManagementSystem.Domain.ValueObjects
 {
-    public Guid Value {get;}
-    public DepartmentId(Guid value)
+    public sealed class DepartmentId
     {
-        if (value == Guid.Empty)
-            throw new ArgumentException("DepartmentId cannot be empty");
+        public Guid Value {get;}
+        public DepartmentId(Guid value)
+        {
+            if (Value == Guid.Empty)
+                throw new ArgumentException("DepartmentId cannot be empty");
 
-        Value = value;
+            this.Value = value;
+        }
     }
 }

@@ -1,3 +1,5 @@
+namespace ManagementSystem.Application.Students.DTOs
+{
 public class StudentDto
 {
     public Guid id { get;  private set; }
@@ -10,4 +12,4 @@ public class StudentDto
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
     }
-}
+}}

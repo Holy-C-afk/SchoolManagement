@@ -1,5 +1,15 @@
-public sealed class Department 
+using ManagementSystem.Domain.ValueObjects;
+namespace ManagementSystem.Domain.Entities
 {
-    public DepartmentId Id { get; private set; }
-    public string Name { get; private set; }
+    public sealed class Department 
+    {
+        public DepartmentId Id { get; private set; }
+        public string Name { get; private set; }
+        private Department() { } // Pour EF Core
+        public Department(string name)
+        {
+            Id = new DepartmentId(Guid.NewGuid());
+            Name = name;
+        }
+    }
 }

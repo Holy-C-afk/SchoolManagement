@@ -1,5 +1,7 @@
 using ManagementSystem.Domain.Entities;
 using ManagementSystem.Domain.ValueObjects;
+using ManagementSystem.Application.Common.Interfaces;
+using ManagementSystem.Application.Students.DTOs;
 
 namespace ManagementSystem.Application.Students
 {

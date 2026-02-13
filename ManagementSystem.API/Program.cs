@@ -8,11 +8,16 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ManagementSystem.Application; // Assure-toi que c'est le namespace exact défini dans ton fichier DependencyInjection.cs
 using ManagementSystem.Application.Common.Interfaces;
+using ManagementSystem.Application.Teachers;
 using QuestPDF.Infrastructure;
+using ManagementSystem.Infrastructure.Repositories;
+using ManagementSystem.Application.Common.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
 // Ajoute tous les services définis dans ton projet Application
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 

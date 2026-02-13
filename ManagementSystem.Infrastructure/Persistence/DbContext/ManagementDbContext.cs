@@ -19,90 +19,64 @@ public class ManagementDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // =========================
-        // Student (SEULE PARTIE MODIFIÉE)
-        // =========================
+        // Student
         modelBuilder.Entity<Student>(builder =>
         {
             builder.HasKey(s => s.Id);
-
             builder.Property(s => s.Id)
-                .HasConversion(
-                    id => id.Value,
-                    value => new StudentId(value))
+                .HasConversion(id => id.Value, value => new StudentId(value))
                 .ValueGeneratedNever();
 
-            // Relation Student -> Exams (sans navigation inverse)
             builder.HasMany(s => s.Exams)
                    .WithOne()
                    .HasForeignKey("StudentId")
                    .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // =========================
-        // Course (INCHANGÉ)
-        // =========================
+        // Course
         modelBuilder.Entity<Course>(builder =>
         {
             builder.HasKey(c => c.Id);
             builder.Property(c => c.Id)
-                .HasConversion(
-                    id => id.Value,
-                    value => new CourseId(value));
+                .HasConversion(id => id.Value, value => new CourseId(value));
         });
 
-        // =========================
-        // Department (INCHANGÉ)
-        // =========================
+        // Department (CORRIGÉ : Suppression de l'imbrication inutile)
         modelBuilder.Entity<Department>(builder =>
         {
             builder.HasKey(d => d.Id);
             builder.Property(d => d.Id)
-                .HasConversion(
-                    id => id.Value,
-                    value => new DepartmentId(value));
+                .HasConversion(d => d.Value, value => new DepartmentId(value));
         });
 
-        // =========================
-        // Exam (INCHANGÉ)
-        // =========================
+        // Exam
         modelBuilder.Entity<Exam>(builder =>
         {
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Id)
-                .HasConversion(
-                    id => id.Value,
-                    value => new ExamId(value));
+                .HasConversion(id => id.Value, value => new ExamId(value));
         });
 
-        // =========================
-        // Teacher (INCHANGÉ)
-        // =========================
+        // Teacher (MODIFIÉ : Ajout indispensable de la conversion de clé étrangère)
         modelBuilder.Entity<Teacher>(builder =>
         {
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Id)
-                .HasConversion(
-                    id => id.Value,
-                    value => new TeacherId(value));
+                .HasConversion(id => id.Value, value => new TeacherId(value));
+            
+            // INDISPENSABLE pour corriger l'erreur de login
+            builder.Property(t => t.DepartmentId)
+                .HasConversion(id => id.Value, value => new DepartmentId(value));
         });
 
-        // =========================
-        // Enrollment (INCHANGÉ)
-        // =========================
+        // Enrollment
         modelBuilder.Entity<Enrollment>(builder =>
         {
             builder.HasKey(e => new { e.StudentId, e.CourseId });
-
             builder.Property(e => e.StudentId)
-                .HasConversion(
-                    id => id.Value,
-                    value => new StudentId(value));
-
+                .HasConversion(id => id.Value, value => new StudentId(value));
             builder.Property(e => e.CourseId)
-                .HasConversion(
-                    id => id.Value,
-                    value => new CourseId(value));
+                .HasConversion(id => id.Value, value => new CourseId(value));
         });
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ManagementDbContext).Assembly);

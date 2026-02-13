@@ -1,3 +1,4 @@
+using ManagementSystem.Domain.ValueObjects; namespace ManagementSystem.Domain.Entities;
 public sealed class Course 
 {
     public CourseId Id { get; private set; }
