@@ -11,22 +11,29 @@ using ManagementSystem.Application.Common.Interfaces;
 using ManagementSystem.Application.Teachers;
 using QuestPDF.Infrastructure;
 using ManagementSystem.Infrastructure.Repositories;
-using ManagementSystem.Application.Common.Interfaces;
+using ManagementSystem.Application.Departments;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddScoped<IPdfService, PdfService>();
-builder.Services.AddScoped<IStudentService, StudentService>();
-builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
-builder.Services.AddScoped<ITeacherService, TeacherService>();
-// Ajoute tous les services définis dans ton projet Application
-builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 
+// --- SERVICES ---
+builder.Services.AddScoped<IPdfService, PdfService>();
+
+// Option A : Soit tu les enregistres ici manuellement
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+
+builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+
+// Option B : Soit tu utilises la méthode d'extension si elle est prête
+// builder.Services.AddApplication(); 
 
 // --- 1. CONFIGURATION DU DBCONTEXT ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContextPool<ManagementDbContext>(options =>
     options.UseSqlServer(connectionString));
-
 // --- 2. CONFIGURATION DU CORS (Pour React) ---
 builder.Services.AddCors(options =>
 {

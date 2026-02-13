@@ -41,13 +41,20 @@ public class ManagementDbContext : DbContext
                 .HasConversion(id => id.Value, value => new CourseId(value));
         });
 
-        // Department (CORRIGÉ : Suppression de l'imbrication inutile)
-        modelBuilder.Entity<Department>(builder =>
-        {
-            builder.HasKey(d => d.Id);
-            builder.Property(d => d.Id)
-                .HasConversion(d => d.Value, value => new DepartmentId(value));
-        });
+        // Department
+modelBuilder.Entity<Department>(builder =>
+{
+    builder.HasKey(d => d.Id);
+    
+    builder.Property(d => d.Id)
+        .HasConversion(id => id.Value, value => new DepartmentId(value))
+        // AJOUT : Indique à EF Core que l'ID est fourni par le code, pas par la DB
+        .ValueGeneratedNever(); 
+
+    builder.Property(d => d.Name)
+        .IsRequired()
+        .HasMaxLength(100);
+});
 
         // Exam
         modelBuilder.Entity<Exam>(builder =>

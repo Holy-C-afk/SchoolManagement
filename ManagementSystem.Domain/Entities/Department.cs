@@ -11,5 +11,10 @@ namespace ManagementSystem.Domain.Entities
             Id = new DepartmentId(Guid.NewGuid());
             Name = name;
         }
+         public void UpdateName(string name)
+    {
+        Name = name;
     }
+    }
+   
 }
